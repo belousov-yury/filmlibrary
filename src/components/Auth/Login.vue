@@ -35,14 +35,15 @@
               .button-list
                 button.button.button-primary(
                   type="submit"
-                  :disabled="submitStatus === 'PENDING'"
-                ) Login
+                )
+                  span(v-if="loading") Loading...
+                  span(v-else) Login
               .button-list.button-list--info
                 p.typo__p(v-if="submitStatus === 'OK'") Thanks for your submission!
                 p.typo__p(v-if="submitStatus === 'ERROR'") Please fill the form correctly.
-                p.typo__p(v-if="submitStatus === 'PENDING'") Sending...
+                p.typo__p(v-else) {{ submitStatus }}
               .button-list.button-list--info
-                span Need registration?
+                span.button-list--info-span Need registration?
                   router-link(to="/registration")  Enter here
 </template>
 
@@ -72,18 +73,26 @@ export default {
       if (this.$v.$invalid) {
         this.submitStatus = 'ERROR'
       } else {
-        console.log('Login!')
         // do your submit logic here
         const user = {
           email: this.email,
           password: this.password
         }
-        console.log(user)
-        this.submitStatus = 'PENDING'
-        setTimeout(() => {
-          this.submitStatus = 'OK'
-        }, 500)
+        this.$store.dispatch('loginUser', user)
+          .then(() => {
+            console.log('LOGIN!')
+            this.submitStatus = 'OK'
+            this.$router.push('/')
+          })
+          .catch(err => {
+            this.submitStatus = err.message
+          })
       }
+    }
+  },
+  computed: {
+    loading () {
+      return this.$store.getters.loading
     }
   }
 }
@@ -119,4 +128,10 @@ input
       margin-bottom 0
 a
   color #444ce0
+.typo__p
+
+  font-size 14px
+  color #fc5c65
+.button-list--info-span
+  font-size 16px
 </style>

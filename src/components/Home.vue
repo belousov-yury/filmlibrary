@@ -188,7 +188,6 @@ export default {
           editing: false
         }
         this.$store.dispatch('newTask', task)
-        console.log(task)
         // Reset
         this.taskTitle = ''
         this.taskDescription = ''
